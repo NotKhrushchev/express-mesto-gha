@@ -10,6 +10,15 @@ const createUser = (req, res) => {
     });
 };
 
+const getAllUsers = (req, res) => {
+  User.find({})
+    .then(users => res.status(200).send(users))
+    .catch(() => {
+      res.status(500).send(`На сервере произошла ошибка`)
+    });
+}
+
 module.exports = {
-  createUser
+  createUser,
+  getAllUsers
 }

@@ -12,4 +12,13 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use('/users', require('./routes/users'));
 
+// Временное решение с фиксированным id пользователя
+app.use((req, res, next) => {
+  req.user = {
+    _id: '64cb737653d99ed14a8760c5'
+  };
+
+  next();
+});
+
 app.listen(port);
