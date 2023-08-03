@@ -10,7 +10,6 @@ mongoose.connect(DATABASE_URL);
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use('/users', require('./routes/users'));
 
 // Временное решение с фиксированным id пользователя
 app.use((req, res, next) => {
@@ -20,5 +19,7 @@ app.use((req, res, next) => {
 
   next();
 });
+
+app.use('/users', require('./routes/users'));
 
 app.listen(port);
