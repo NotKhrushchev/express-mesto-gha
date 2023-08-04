@@ -32,40 +32,42 @@ const removeCard = (req, res) => {
 
 // Лайк карточки
 const likeCard = (req, res) => {
-  if (req.user._id) {
+  const isIdValid = req.params.cardId.length === 24;
+  if (isIdValid) {
     Card.findByIdAndUpdate(
       req.params.cardId,
       { $addToSet: { likes: req.user._id } },
       { new: true, runValidators: true },
     )
-      .then((likedCard) => res.status(200).send(likedCard))
-      .catch((err) => {
-        if (err.name === 'ValidationError') {
-          res.status(404).send({ message: 'Передан несуществующий id карточки' });
+      .then((likedCard) => {
+        if (dislikeCard) {
+          res.status(200).send(likedCard);
           return;
-        }
-        res.status(500).send(defaultServerError);
-      });
+        };
+        res.status(404).send({ message: 'Передан несуществующий id карточки' });
+      })
+      .catch(() => res.status(500).send(defaultServerError));
     return;
   }
   res.status(400).send({ message: 'Переданы некорректные данные для постановки лайка' });
 };
 
 const dislikeCard = (req, res) => {
-  if (req.user._id) {
+  const isIdValid = req.params.cardId.length === 24;
+  if (isIdValid) {
     Card.findByIdAndUpdate(
       req.params.cardId,
       { $pull: { likes: req.user._id } },
       { new: true, runValidators: true },
     )
-      .then((dislikedCard) => res.status(200).send(dislikedCard))
-      .catch((err) => {
-        if (err.name === 'ValidationError') {
-          res.status(404).send({ message: 'Передан несуществующий id карточки' });
+      .then((dislikedCard) => {
+        if (dislikeCard) {
+          res.status(200).send(dislikedCard);
           return;
-        }
-        res.status(500).send(defaultServerError);
-      });
+        };
+        res.status(404).send({ message: 'Передан несуществующий id карточки' });
+      })
+      .catch(() => res.status(500).send(defaultServerError));
     return;
   }
   res.status(400).send({ message: 'Переданы некорректные данные для постановки лайка' });
