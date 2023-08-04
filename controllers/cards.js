@@ -4,8 +4,7 @@ const defaultServerError = { message: 'На сервере произошла о
 // Создание карточки
 const createCard = (req, res) => {
   const { name, link } = req.body;
-  const { _id } = req.user;
-  Card.create({ name, link, owner: _id})
+  Card.create({ name, link, owner: req.user._id})
     .then(card => res.status(201).send(card))
     .catch(err => {
       if (err.name === 'ValidationError') {
@@ -19,12 +18,17 @@ const createCard = (req, res) => {
 const getAllCards = (req, res) => {
   Card.find({})
     .then(users => res.status(200).send(users))
-    .catch(() => {
-      res.status(500).send(defaultServerError);
-    });
+    .catch(() => res.status(500).send(defaultServerError));
+};
+
+const removeCard = (req, res) => {
+  Card.findByIdAndRemove(req.params.cardId)
+    .then(() => res.status(200))
+    .catch(() => res.status(404).send({ message: 'Карточка с указанным id не найдена'}));
 };
 
 module.exports = {
   createCard,
-  getAllCards
+  getAllCards,
+  removeCard
 }

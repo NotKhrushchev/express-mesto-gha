@@ -19,9 +19,7 @@ const createUser = (req, res) => {
 const getAllUsers = (req, res) => {
   User.find({})
     .then(users => res.status(200).send(users))
-    .catch(() => {
-      res.status(500).send(defaultServerError);
-    });
+    .catch(() => res.status(500).send(defaultServerError));
 };
 
 // Получение данных пользователя по id
@@ -34,16 +32,13 @@ const getUserById = (req, res) => {
       };
       res.status(200).send(user);
     })
-    .catch(() => {
-      res.status(500).send(defaultServerError);
-    });
+    .catch(() => res.status(500).send(defaultServerError));
 };
 
 // Изменение информации о пользователе
 const editUserInfo = (req, res) => {
   const { name, about } = req.body;
-  const { _id } = req.user
-  if (_id) {
+  if (req.user._id) {
     User.findByIdAndUpdate(
       req.user._id,
       { name: name, about: about },
