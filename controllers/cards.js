@@ -40,10 +40,10 @@ const likeCard = (req, res) => {
       { new: true, runValidators: true },
     )
       .then((likedCard) => {
-        if (dislikeCard) {
+        if (likedCard) {
           res.status(200).send(likedCard);
           return;
-        };
+        }
         res.status(404).send({ message: 'Передан несуществующий id карточки' });
       })
       .catch(() => res.status(500).send(defaultServerError));
@@ -64,7 +64,7 @@ const dislikeCard = (req, res) => {
         if (dislikeCard) {
           res.status(200).send(dislikedCard);
           return;
-        };
+        }
         res.status(404).send({ message: 'Передан несуществующий id карточки' });
       })
       .catch(() => res.status(500).send(defaultServerError));
