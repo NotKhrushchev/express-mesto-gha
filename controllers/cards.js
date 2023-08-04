@@ -33,7 +33,7 @@ const removeCard = (req, res) => {
       }
       res.status(404).send({ message: 'Карточка с указанным id не найдена' });
     })
-    .catch(() => res.status(500).send(defaultServerError));
+    .catch(() => res.status(400).send({ message: 'Переданы некорректные данные для удаления карточки' }));
 };
 
 // Лайк карточки
