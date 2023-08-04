@@ -11,7 +11,7 @@ const createUser = (req, res) => {
         res.status(400).send({ message: 'Переданы некорректные данные при создании пользователя' });
         return;
       };
-      res.status(500).send(defaultServerError)
+      res.status(500).send(defaultServerError);
     });
 };
 
@@ -51,8 +51,8 @@ const editUserInfo = (req, res) => {
           return;
         };
         res.status(404).send({ message: 'Пользователь по указанному id не найден' });
-      })
-    return
+      });
+    return;
   }
   res.status(500).send(defaultServerError);
 }
@@ -73,8 +73,8 @@ const editUserAvatar = (req, res) => {
           return;
         };
         res.status(404).send({ message: 'Пользователь по указанному id не найден' });
-      })
-    return
+      });
+    return;
   }
   res.status(500).send(defaultServerError);
 }

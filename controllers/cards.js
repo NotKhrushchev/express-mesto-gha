@@ -15,20 +15,44 @@ const createCard = (req, res) => {
     });
 }
 
+// Получение массива карточек
 const getAllCards = (req, res) => {
   Card.find({})
-    .then(users => res.status(200).send(users))
+    .then(cards => res.status(200).send(cards))
     .catch(() => res.status(500).send(defaultServerError));
 };
 
+// Удаление карточки
 const removeCard = (req, res) => {
   Card.findByIdAndRemove(req.params.cardId)
     .then(() => res.status(200))
     .catch(() => res.status(404).send({ message: 'Карточка с указанным id не найдена'}));
 };
 
+// Лайк карточки
+const likeCard = (req, res) => {
+  if (req.user._id) {
+    Card.findByIdAndUpdate(
+      req.params.cardId,
+      { $addToSet: { likes: req.user._id } },
+      { new: true, runValidators: true }
+    )
+      .then(likedCard => res.status(200).send(likedCard))
+      .catch(err => {
+        if (err.name === 'ValidationError') {
+          res.status(404).send({ message: 'Передан несуществующий id карточки' });
+          return;
+        };
+        res.status(500).send(defaultServerError);
+      });
+    return;
+  };
+  res.status(400).send({ message: 'Переданы некорректные данные для постановки лайка' });
+}
+
 module.exports = {
   createCard,
   getAllCards,
-  removeCard
+  removeCard,
+  likeCard
 }
