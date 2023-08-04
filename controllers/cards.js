@@ -26,8 +26,14 @@ const getAllCards = (req, res) => {
 // Удаление карточки
 const removeCard = (req, res) => {
   Card.findByIdAndRemove(req.params.cardId)
-    .then(() => res.status(200))
-    .catch(() => res.status(404).send({ message: 'Карточка с указанным id не найдена' }));
+    .then((card) => {
+      if (card) {
+        res.status(200).send(card);
+        return;
+      }
+      res.status(404).send({ message: 'Карточка с указанным id не найдена' });
+    })
+    .catch(() => res.status(500).send(defaultServerError));
 };
 
 // Лайк карточки
