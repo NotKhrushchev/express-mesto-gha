@@ -1,16 +1,17 @@
 const User = require('../models/user');
+
 const defaultServerError = { message: 'На сервере произошла ошибка' };
 
 // Создание пользователя
 const createUser = (req, res) => {
   const { name, about, avatar } = req.body;
   User.create({ name, about, avatar })
-    .then(user => res.status(201).send(user))
-    .catch(err => {
+    .then((user) => res.status(201).send(user))
+    .catch((err) => {
       if (err.name === 'ValidationError') {
         res.status(400).send({ message: 'Переданы некорректные данные при создании пользователя' });
         return;
-      };
+      }
       res.status(500).send(defaultServerError);
     });
 };
@@ -18,18 +19,18 @@ const createUser = (req, res) => {
 // Получение массива пользователей
 const getAllUsers = (req, res) => {
   User.find({})
-    .then(users => res.status(200).send(users))
+    .then((users) => res.status(200).send(users))
     .catch(() => res.status(500).send(defaultServerError));
 };
 
 // Получение данных пользователя по id
 const getUserById = (req, res) => {
   User.findById(req.params.userId)
-    .then(user => {
+    .then((user) => {
       if (!user) {
         res.status(404).send({ message: 'Пользователь по указанному id не найден' });
         return;
-      };
+      }
       res.status(200).send(user);
     })
     .catch(() => res.status(500).send(defaultServerError));
@@ -41,21 +42,21 @@ const editUserInfo = (req, res) => {
   if (req.user._id) {
     User.findByIdAndUpdate(
       req.user._id,
-      { name: name, about: about },
-      { new: true, runValidators: true }
+      { name, about },
+      { new: true, runValidators: true },
     )
-      .then(editedProfile => res.status(200).send(editedProfile))
-      .catch(err => {
+      .then((editedProfile) => res.status(200).send(editedProfile))
+      .catch((err) => {
         if (err.name === 'ValidationError') {
           res.status(400).send({ message: 'Переданы некорректные данные при обновлении пользователя' });
           return;
-        };
+        }
         res.status(404).send({ message: 'Пользователь по указанному id не найден' });
       });
     return;
   }
   res.status(500).send(defaultServerError);
-}
+};
 
 // Изменение аватара пользователя
 const editUserAvatar = (req, res) => {
@@ -63,26 +64,26 @@ const editUserAvatar = (req, res) => {
   if (req.user._id) {
     User.findByIdAndUpdate(
       req.user._id,
-      { avatar: avatar },
-      { new: true, runValidators: true }
+      { avatar },
+      { new: true, runValidators: true },
     )
-      .then(editedProfile => res.status(200).send(editedProfile))
-      .catch(err => {
+      .then((editedProfile) => res.status(200).send(editedProfile))
+      .catch((err) => {
         if (err.name === 'ValidationError') {
           res.status(400).send({ message: 'Переданы некорректные данные при обновлении пользователя' });
           return;
-        };
+        }
         res.status(404).send({ message: 'Пользователь по указанному id не найден' });
       });
     return;
   }
   res.status(500).send(defaultServerError);
-}
+};
 
 module.exports = {
   createUser,
   getAllUsers,
   getUserById,
   editUserInfo,
-  editUserAvatar
-}
+  editUserAvatar,
+};
