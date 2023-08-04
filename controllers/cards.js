@@ -16,6 +16,15 @@ const createCard = (req, res) => {
     });
 }
 
+const getAllCards = (req, res) => {
+  Card.find({})
+    .then(users => res.status(200).send(users))
+    .catch(() => {
+      res.status(500).send(defaultServerError);
+    });
+};
+
 module.exports = {
-  createCard
+  createCard,
+  getAllCards
 }
