@@ -61,7 +61,7 @@ const dislikeCard = (req, res) => {
       { new: true, runValidators: true },
     )
       .then((dislikedCard) => {
-        if (dislikeCard) {
+        if (dislikedCard) {
           res.status(200).send(dislikedCard);
           return;
         }

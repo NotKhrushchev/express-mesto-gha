@@ -25,15 +25,20 @@ const getAllUsers = (req, res) => {
 
 // Получение данных пользователя по id
 const getUserById = (req, res) => {
-  User.findById(req.params.userId)
-    .then((user) => {
-      if (!user) {
-        res.status(400).send({ message: 'Пользователь по указанному id не найден' });
-        return;
-      }
-      res.status(200).send(user);
-    })
-    .catch(() => res.status(500).send(defaultServerError));
+  const isIdValid = req.params.cardId.length === 24;
+  if (isIdValid) {
+    User.findById(req.params.userId)
+      .then((user) => {
+        if (!user) {
+          res.status(404).send({ message: 'Пользователь по указанному id не найден' });
+          return;
+        }
+        res.status(200).send(user);
+      })
+      .catch(() => res.status(500).send(defaultServerError));
+    return
+  }
+  res.status(400).send({message: 'Переданы некорректные данные для получения пользователя'})
 };
 
 // Изменение информации о пользователе
