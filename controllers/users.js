@@ -36,9 +36,9 @@ const getUserById = (req, res) => {
         res.status(200).send(user);
       })
       .catch(() => res.status(500).send(defaultServerError));
-    return
+    return;
   }
-  res.status(400).send({message: 'Переданы некорректные данные для получения пользователя'})
+  res.status(400).send({ message: 'Переданы некорректные данные для получения пользователя' });
 };
 
 // Изменение информации о пользователе
