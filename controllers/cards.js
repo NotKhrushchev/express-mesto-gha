@@ -50,9 +50,30 @@ const likeCard = (req, res) => {
   res.status(400).send({ message: 'Переданы некорректные данные для постановки лайка' });
 }
 
+const dislikeCard = (req, res) => {
+  if (req.user._id) {
+    Card.findByIdAndUpdate(
+      req.params.cardId,
+      { $pull: { likes: req.user._id } },
+      { new: true, runValidators: true }
+    )
+      .then(dislikedCard => res.status(200).send(dislikedCard))
+      .catch(err => {
+        if (err.name === 'ValidationError') {
+          res.status(404).send({ message: 'Передан несуществующий id карточки' });
+          return;
+        };
+        res.status(500).send(defaultServerError);
+      });
+    return;
+  };
+  res.status(400).send({ message: 'Переданы некорректные данные для постановки лайка' });
+}
+
 module.exports = {
   createCard,
   getAllCards,
   removeCard,
-  likeCard
+  likeCard,
+  dislikeCard
 }
