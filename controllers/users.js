@@ -42,7 +42,8 @@ const getUserById = (req, res) => {
 // Изменение информации о пользователе
 const editUserInfo = (req, res) => {
   const { name, about } = req.body;
-  if (req.user._id) {
+  const { _id } = req.user
+  if (_id) {
     User.findByIdAndUpdate(
       req.user._id,
       { name: name, about: about },
