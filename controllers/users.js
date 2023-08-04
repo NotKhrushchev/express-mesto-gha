@@ -25,7 +25,7 @@ const getAllUsers = (req, res) => {
 
 // Получение данных пользователя по id
 const getUserById = (req, res) => {
-  const isIdValid = req.params.cardId.length === 24;
+  const isIdValid = req.params.userId.length === 24;
   if (isIdValid) {
     User.findById(req.params.userId)
       .then((user) => {
