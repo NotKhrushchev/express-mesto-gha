@@ -55,10 +55,10 @@ const getUserById = (req, res) => {
 
 // Изменение информации о пользователе
 const editUserInfo = (req, res) => {
-  const { userId } = req.params;
+  const { _id } = req.user;
   const { name, about } = req.body;
   User.findByIdAndUpdate(
-    userId,
+    _id,
     { name, about },
     { new: true, runValidators: true },
   )
@@ -84,10 +84,10 @@ const editUserInfo = (req, res) => {
 
 // Изменение аватара пользователя
 const editUserAvatar = (req, res) => {
-  const { userId } = req.params;
+  const { _id } = req.user;
   const { avatar } = req.body;
   User.findByIdAndUpdate(
-    userId,
+    _id,
     { avatar },
     { new: true, runValidators: true },
   )

@@ -10,9 +10,9 @@ const defaultServerError = { message: 'На сервере произошла о
 
 // Создание карточки
 const createCard = (req, res) => {
-  const { userId } = req.user;
+  const { _id } = req.user;
   const { name, link } = req.body;
-  Card.create({ name, link, owner: userId })
+  Card.create({ name, link, owner: _id })
     .then((card) => res.status(CREATED).send(card))
     .catch((err) => {
       switch (err.constructor) {
@@ -56,11 +56,11 @@ const removeCard = (req, res) => {
 
 // Лайк карточки
 const likeCard = (req, res) => {
-  const { userId } = req.user._id;
+  const { _id } = req.user;
   const { cardId } = req.params;
   Card.findByIdAndUpdate(
     cardId,
-    { $addToSet: { likes: userId } },
+    { $addToSet: { likes: _id } },
     { new: true },
   )
     .orFail()
@@ -81,11 +81,11 @@ const likeCard = (req, res) => {
 };
 
 const dislikeCard = (req, res) => {
-  const { userId } = req.user._id;
+  const { _id } = req.user;
   const { cardId } = req.params;
   Card.findByIdAndUpdate(
     cardId,
-    { $pull: { likes: userId } },
+    { $pull: { likes: _id } },
     { new: true },
   )
     .orFail()
