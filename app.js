@@ -1,19 +1,19 @@
 const express = require('express');
 const mongoose = require('mongoose');
-const bodyParser = require('body-parser');
+const { StatusCodes } = require('http-status-codes');
+
+const { NOT_FOUND } = StatusCodes;
 
 const port = process.env.PORT || '3000';
 const DATABASE_URL = process.env.DATABASE_URL || 'mongodb://127.0.0.1:27017/mestodb';
 
-const userRoute = require('./routes/users');
-const cardRoute = require('./routes/cards');
+const routes = require('./routes/index');
 
 const app = express();
 
 mongoose.connect(DATABASE_URL);
 
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(express.json());
 
 // Временное решение с захардкоженным id пользователя
 app.use((req, res, next) => {
@@ -24,10 +24,10 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use('/users', userRoute);
-app.use('/cards', cardRoute);
+app.use('/users', routes.userRoute);
+app.use('/cards', routes.cardRoute);
 app.use('*', (req, res) => {
-  res.status(404).send({ message: 'Страница не неайдена' });
+  res.status(NOT_FOUND).send({ message: 'Страница не неайдена' });
 });
 
 app.listen(port);

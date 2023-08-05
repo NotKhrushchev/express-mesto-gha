@@ -1,3 +1,9 @@
+const { StatusCodes } = require('http-status-codes');
+
+const {
+  CREATED, BAD_REQUEST, INTERNAL_SERVER_ERROR, NOT_FOUND, OK,
+} = StatusCodes;
+const { default: mongoose } = require('mongoose');
 const User = require('../models/user');
 
 const defaultServerError = { message: 'На сервере произошла ошибка' };
@@ -6,83 +12,99 @@ const defaultServerError = { message: 'На сервере произошла о
 const createUser = (req, res) => {
   const { name, about, avatar } = req.body;
   User.create({ name, about, avatar })
-    .then((user) => res.status(201).send(user))
+    .then((user) => res.status(CREATED).send(user))
     .catch((err) => {
-      if (err.name === 'ValidationError') {
-        res.status(400).send({ message: 'Переданы некорректные данные при создании пользователя' });
-        return;
+      switch (err.constructor) {
+        case mongoose.Error.ValidationError:
+          res.status(BAD_REQUEST).send({ message: 'Переданы некорректные данные при создании пользователя' });
+          break;
+        default:
+          res.status(INTERNAL_SERVER_ERROR).send(defaultServerError);
+          break;
       }
-      res.status(500).send(defaultServerError);
     });
 };
 
 // Получение массива пользователей
 const getAllUsers = (req, res) => {
   User.find({})
-    .then((users) => res.status(200).send(users))
-    .catch(() => res.status(500).send(defaultServerError));
+    .then((users) => res.status(OK).send(users))
+    .catch(() => res.status(INTERNAL_SERVER_ERROR).send(defaultServerError));
 };
 
 // Получение данных пользователя по id
 const getUserById = (req, res) => {
-  const isIdValid = req.params.userId.length === 24;
-  if (isIdValid) {
-    User.findById(req.params.userId)
-      .then((user) => {
-        if (!user) {
-          res.status(404).send({ message: 'Пользователь по указанному id не найден' });
-          return;
-        }
-        res.status(200).send(user);
-      })
-      .catch(() => res.status(500).send(defaultServerError));
-    return;
-  }
-  res.status(400).send({ message: 'Переданы некорректные данные для получения пользователя' });
+  const { userId } = req.params;
+  User.findById(userId)
+    .orFail()
+    .then((user) => res.status(OK).send(user))
+    .catch((err) => {
+      switch (err.constructor) {
+        case mongoose.Error.CastError:
+          res.status(BAD_REQUEST).send({ message: 'Передан невалидный id пользователя' });
+          break;
+        case mongoose.Error.DocumentNotFoundError:
+          res.status(NOT_FOUND).send({ message: 'Пользователь по указанному id не найден' });
+          break;
+        default:
+          res.status(INTERNAL_SERVER_ERROR).send(defaultServerError);
+          break;
+      }
+    });
 };
 
 // Изменение информации о пользователе
 const editUserInfo = (req, res) => {
+  const { userId } = req.params;
   const { name, about } = req.body;
-  if (req.user._id) {
-    User.findByIdAndUpdate(
-      req.user._id,
-      { name, about },
-      { new: true, runValidators: true },
-    )
-      .then((editedProfile) => res.status(200).send(editedProfile))
-      .catch((err) => {
-        if (err.name === 'ValidationError') {
-          res.status(400).send({ message: 'Переданы некорректные данные при обновлении пользователя' });
-          return;
-        }
-        res.status(404).send({ message: 'Пользователь по указанному id не найден' });
-      });
-    return;
-  }
-  res.status(500).send(defaultServerError);
+  User.findByIdAndUpdate(
+    userId,
+    { name, about },
+    { new: true, runValidators: true },
+  )
+    .orFail()
+    .then((editedProfile) => res.status(OK).send(editedProfile))
+    .catch((err) => {
+      switch (err.constructor) {
+        case mongoose.Error.ValidationError:
+          res.status(BAD_REQUEST).send({ message: 'Переданы некорректные данные при обновлении пользователя' });
+          break;
+        case mongoose.Error.CastError:
+          res.status(BAD_REQUEST).send({ message: 'Передан невалидный id пользователя' });
+          break;
+        case mongoose.Error.DocumentNotFoundError:
+          res.status(NOT_FOUND).send({ message: 'Пользователь по указанному id не найден' });
+          break;
+        default:
+          res.status(INTERNAL_SERVER_ERROR).send(defaultServerError);
+          break;
+      }
+    });
 };
 
 // Изменение аватара пользователя
 const editUserAvatar = (req, res) => {
+  const { userId } = req.params;
   const { avatar } = req.body;
-  if (req.user._id) {
-    User.findByIdAndUpdate(
-      req.user._id,
-      { avatar },
-      { new: true, runValidators: true },
-    )
-      .then((editedProfile) => res.status(200).send(editedProfile))
-      .catch((err) => {
-        if (err.name === 'ValidationError') {
-          res.status(400).send({ message: 'Переданы некорректные данные при обновлении пользователя' });
-          return;
-        }
-        res.status(404).send({ message: 'Пользователь по указанному id не найден' });
-      });
-    return;
-  }
-  res.status(500).send(defaultServerError);
+  User.findByIdAndUpdate(
+    userId,
+    { avatar },
+    { new: true, runValidators: true },
+  )
+    .then((editedProfile) => res.status(OK).send(editedProfile))
+    .catch((err) => {
+      switch (err.constructor) {
+        case mongoose.Error.ValidationError:
+          res.status(BAD_REQUEST).send({ message: 'Переданы некорректные данные при обновлении пользователя' });
+          break;
+        case mongoose.Error.DocumentNotFoundError:
+          res.status(NOT_FOUND).send({ message: 'Пользователь по указанному id не найден' });
+          break;
+        default:
+          res.status(INTERNAL_SERVER_ERROR).send(defaultServerError);
+          break;
+      }
+    });
 };
 
 module.exports = {
