@@ -69,9 +69,6 @@ const editUserInfo = (req, res) => {
         case mongoose.Error.ValidationError:
           res.status(BAD_REQUEST).send({ message: 'Переданы некорректные данные при обновлении пользователя' });
           break;
-        case mongoose.Error.CastError:
-          res.status(BAD_REQUEST).send({ message: 'Передан невалидный id пользователя' });
-          break;
         case mongoose.Error.DocumentNotFoundError:
           res.status(NOT_FOUND).send({ message: 'Пользователь по указанному id не найден' });
           break;
@@ -91,6 +88,7 @@ const editUserAvatar = (req, res) => {
     { avatar },
     { new: true, runValidators: true },
   )
+    .orFail()
     .then((editedProfile) => res.status(OK).send(editedProfile))
     .catch((err) => {
       switch (err.constructor) {
