@@ -10,8 +10,12 @@ const defaultServerError = { message: 'На сервере произошла о
 
 // Создание пользователя
 const createUser = (req, res) => {
-  const { name, about, avatar } = req.body;
-  User.create({ name, about, avatar })
+  const {
+    email, password, name, about, avatar,
+  } = req.body;
+  User.create({
+    email, password, name, about, avatar,
+  })
     .then((user) => res.status(CREATED).send(user))
     .catch((err) => {
       switch (err.constructor) {

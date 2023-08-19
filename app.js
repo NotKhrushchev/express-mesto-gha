@@ -27,7 +27,7 @@ app.use((req, res, next) => {
 app.use('/users', routes.userRoute);
 app.use('/cards', routes.cardRoute);
 app.use('*', (req, res) => {
-  res.status(NOT_FOUND).send({ message: 'Страница не неайдена' });
+  res.status(NOT_FOUND).send({ message: 'Страница не найдена' });
 });
 
 app.listen(port);
