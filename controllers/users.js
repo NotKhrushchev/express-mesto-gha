@@ -1,7 +1,9 @@
 const { StatusCodes } = require('http-status-codes');
 
+const bcrypt = require('bcryptjs');
+
 const {
-  CREATED, BAD_REQUEST, INTERNAL_SERVER_ERROR, NOT_FOUND, OK,
+  CREATED, BAD_REQUEST, INTERNAL_SERVER_ERROR, NOT_FOUND, OK, UNAUTHORIZED,
 } = StatusCodes;
 const { default: mongoose } = require('mongoose');
 const User = require('../models/user');
@@ -13,9 +15,10 @@ const createUser = (req, res) => {
   const {
     email, password, name, about, avatar,
   } = req.body;
-  User.create({
-    email, password, name, about, avatar,
-  })
+  bcrypt.hash(password, 10)
+    .then((hash) => User.create({
+      email, password: hash, name, about, avatar,
+    }))
     .then((user) => res.status(CREATED).send(user))
     .catch((err) => {
       switch (err.constructor) {
@@ -101,6 +104,33 @@ const editUserAvatar = (req, res) => {
           break;
         case mongoose.Error.DocumentNotFoundError:
           res.status(NOT_FOUND).send({ message: 'Пользователь по указанному id не найден' });
+          break;
+        default:
+          res.status(INTERNAL_SERVER_ERROR).send(defaultServerError);
+          break;
+      }
+    });
+};
+
+const login = (req, res) => {
+  const { email, password } = req.body;
+  User.findOne({ email })
+    .then((user) => {
+      if (user) {
+        return bcrypt.compare(password, user.password);
+      }
+      return Promise.reject(new mongoose.Error.CastError());
+    })
+    .then((matched) => {
+      if (matched) {
+        return res.send({ message: 'Всё верно!' });
+      }
+      return Promise.reject(new mongoose.Error.CastError());
+    })
+    .catch((err) => {
+      switch (err.constructor) {
+        case mongoose.Error.CastError:
+          res.status(UNAUTHORIZED).send({ message: 'Неправильные почта или пароль' });
           break;
         default:
           res.status(INTERNAL_SERVER_ERROR).send(defaultServerError);
