@@ -1,4 +1,5 @@
 const { StatusCodes } = require('http-status-codes');
+const jwt = require('jsonwebtoken');
 
 const bcrypt = require('bcryptjs');
 
@@ -116,16 +117,17 @@ const login = (req, res) => {
   const { email, password } = req.body;
   User.findOne({ email })
     .then((user) => {
-      if (user) {
-        return bcrypt.compare(password, user.password);
+      if (!user) {
+        return Promise.reject(new mongoose.Error.CastError());
       }
-      return Promise.reject(new mongoose.Error.CastError());
-    })
-    .then((matched) => {
-      if (matched) {
-        return res.send({ message: 'Всё верно!' });
-      }
-      return Promise.reject(new mongoose.Error.CastError());
+      return bcrypt.compare(password, user.password)
+        .then(matched => {
+          if (!matched) {
+            return Promise.reject(new mongoose.Error.CastError());
+          }
+          const token = jwt.sign({ _id: user._id }, 'key', { expiresIn: '7d' });
+          res.send(token);
+        })
     })
     .catch((err) => {
       switch (err.constructor) {
