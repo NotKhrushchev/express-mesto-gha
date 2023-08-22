@@ -15,14 +15,14 @@ router.get('/:userId', celebrate({
 
 router.patch('/me', celebrate({
   body: Joi.object().keys({
-    name: Joi.string.min(2).max(30),
-    about: Joi.string.min(2).max(200),
+    name: Joi.string().min(2).max(30),
+    about: Joi.string().min(2).max(200),
   }),
 }), editUserInfo);
 
 router.patch('/me/avatar', celebrate({
   body: Joi.object().keys({
-    avatar: Joi.string.pattern(/(http(s?):)([/|.|\w|\s|-])*\.(?:jpg|gif|png)/g),
+    avatar: Joi.string().pattern(/(http(s?):)([/|.|\w|\s|-])*\.(?:jpg|gif|png)/g),
   }),
 }), editUserAvatar);
 

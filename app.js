@@ -26,7 +26,7 @@ app.use(express.json());
 // Роут аутентификации
 app.post('/signin', celebrate({
   body: Joi.object().keys({
-    email: Joi.string.required().unique().email(),
+    email: Joi.string().required().unique().email(),
     password: Joi.string().required(),
   }),
 }), login);
@@ -34,11 +34,11 @@ app.post('/signin', celebrate({
 // Роут регистрации
 app.post('/signup', celebrate({
   body: Joi.object().keys({
-    email: Joi.string.required().unique().email(),
+    email: Joi.string().required().unique().email(),
     password: Joi.string().required(),
-    name: Joi.string.min(2).max(30),
-    about: Joi.string.min(2).max(200),
-    avatar: Joi.string.pattern(/(http(s?):)([/|.|\w|\s|-])*\.(?:jpg|gif|png)/g),
+    name: Joi.string().min(2).max(30),
+    about: Joi.string().min(2).max(200),
+    avatar: Joi.string().pattern(/(http(s?):)([/|.|\w|\s|-])*\.(?:jpg|gif|png)/g),
   }),
 }), createUser);
 
