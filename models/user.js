@@ -19,7 +19,7 @@ const userSchema = new mongoose.Schema({
   name: {
     type: String,
     minlength: [2, 'Минимальная длина name - 2'],
-    maxlength: [40, 'Максимальная длина name - 40'],
+    maxlength: [30, 'Максимальная длина name - 30'],
     default: 'Жак-Ив Кусто',
   },
   about: {

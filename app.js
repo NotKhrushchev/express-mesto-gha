@@ -1,6 +1,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const { StatusCodes } = require('http-status-codes');
+const { errors, celebrate, Joi } = require('celebrate');
 
 const { NOT_FOUND, INTERNAL_SERVER_ERROR } = StatusCodes;
 
@@ -10,6 +11,7 @@ const DATABASE_URL = process.env.DATABASE_URL || 'mongodb://127.0.0.1:27017/mest
 const routes = require('./routes/index');
 const { login, createUser } = require('./controllers/users');
 const { auth } = require('./middlewares/auth');
+const { NotFoundErr } = require('./errors');
 
 const app = express();
 
@@ -21,16 +23,34 @@ mongoose.connect(DATABASE_URL, {
 
 app.use(express.json());
 
-app.post('/signin', login);
-app.post('/signup', createUser);
+// Роут аутентификации
+app.post('/signin', celebrate({
+  body: Joi.object().keys({
+    email: Joi.string.required().unique().email(),
+    password: Joi.string().required(),
+  }),
+}), login);
+
+// Роут регистрации
+app.post('/signup', celebrate({
+  body: Joi.object().keys({
+    email: Joi.string.required().unique().email(),
+    password: Joi.string().required(),
+    name: Joi.string.min(2).max(30),
+    about: Joi.string.min(2).max(200),
+    avatar: Joi.string.pattern(/(http(s?):)([/|.|\w|\s|-])*\.(?:jpg|gif|png)/g),
+  }),
+}), createUser);
 
 app.use(auth);
 
 app.use('/users', routes.userRoute);
 app.use('/cards', routes.cardRoute);
 app.use('*', (req, res) => {
-  res.status(NOT_FOUND).send({ message: 'Страница не найдена' });
+  throw new NotFoundErr('Страница не найдена');
 });
+
+app.use(errors());
 
 // Глобальный мидлвэр для обработки ошибок
 app.use((err, req, res, next) => {

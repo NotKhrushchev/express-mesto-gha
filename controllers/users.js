@@ -136,6 +136,14 @@ const login = (req, res, next) => {
     .catch(next);
 };
 
+// Получение данных авторизованного пользователя
+const getMe = (req, res, next) => {
+  const { _id } = req.user;
+  User.findById(_id)
+    .then((user) => res.status(OK).send(user))
+    .catch(next);
+};
+
 module.exports = {
   createUser,
   getAllUsers,
@@ -143,4 +151,5 @@ module.exports = {
   editUserInfo,
   editUserAvatar,
   login,
+  getMe,
 };
