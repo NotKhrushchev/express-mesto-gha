@@ -4,8 +4,8 @@ const validator = require('validator');
 const userSchema = new mongoose.Schema({
   email: {
     type: String,
-    required: true,
-    unique: true,
+    required: [true, 'Поле email обязательное'],
+    unique: [true, 'sdsdsdsd'],
     validate: {
       validator: (email) => validator.isEmail(email),
       message: 'Введите корректный email',
@@ -13,24 +13,27 @@ const userSchema = new mongoose.Schema({
   },
   password: {
     type: String,
-    required: true,
-    minlength: 8,
+    required: [true, 'Поле password обязательное'],
   },
   name: {
     type: String,
-    minlength: 2,
-    maxlength: 30,
+    minlength: [2, 'Минимальная длина name - 2'],
+    maxlength: [40, 'Максимальная длина name - 40'],
     default: 'Жак-Ив Кусто',
   },
   about: {
     type: String,
-    minlength: 2,
-    maxlength: 30,
+    minlength: [2, 'Минимальная длина about - 2'],
+    maxlength: [200, 'Максимальная длина about - 200'],
     default: 'Исследователь',
   },
   avatar: {
     type: String,
     default: 'https://pictures.s3.yandex.net/resources/jacques-cousteau_1604399756.png',
+    validate: {
+      validator: (link) => /(http(s?):)([/|.|\w|\s|-])*\.(?:jpg|gif|png)/g.test(link),
+      message: 'Введите корректную ссылку',
+    },
   },
 });
 

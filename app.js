@@ -8,21 +8,23 @@ const port = process.env.PORT || '3000';
 const DATABASE_URL = process.env.DATABASE_URL || 'mongodb://127.0.0.1:27017/mestodb';
 
 const routes = require('./routes/index');
+const { login, createUser } = require('./controllers/users');
+const { auth } = require('./middlewares/auth');
 
 const app = express();
 
-mongoose.connect(DATABASE_URL);
+mongoose.connect(DATABASE_URL, {
+  useUnifiedTopology: true,
+  useNewUrlParser: true,
+  autoIndex: true,
+});
 
 app.use(express.json());
 
-// Временное решение с захардкоженным id пользователя
-app.use((req, res, next) => {
-  req.user = {
-    _id: '64cb737653d99ed14a8760c5',
-  };
+app.post('/signin', login);
+app.post('/signup', createUser);
 
-  next();
-});
+app.use(auth);
 
 app.use('/users', routes.userRoute);
 app.use('/cards', routes.cardRoute);

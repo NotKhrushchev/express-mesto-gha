@@ -22,9 +22,13 @@ const createUser = (req, res) => {
     }))
     .then((user) => res.status(CREATED).send(user))
     .catch((err) => {
+      if (err.code === 11000) {
+        res.status(INTERNAL_SERVER_ERROR).send({ message: 'Указанный email уже существует' });
+        return;
+      }
       switch (err.constructor) {
         case mongoose.Error.ValidationError:
-          res.status(BAD_REQUEST).send({ message: 'Переданы некорректные данные при создании пользователя' });
+          res.status(BAD_REQUEST).send({ message: err.message.split(':')[2] });
           break;
         default:
           res.status(INTERNAL_SERVER_ERROR).send(defaultServerError);
@@ -113,6 +117,7 @@ const editUserAvatar = (req, res) => {
     });
 };
 
+// Аутентификация
 const login = (req, res) => {
   const { email, password } = req.body;
   User.findOne({ email })
@@ -121,13 +126,13 @@ const login = (req, res) => {
         return Promise.reject(new mongoose.Error.CastError());
       }
       return bcrypt.compare(password, user.password)
-        .then(matched => {
+        .then((matched) => {
           if (!matched) {
             return Promise.reject(new mongoose.Error.CastError());
           }
           const token = jwt.sign({ _id: user._id }, 'key', { expiresIn: '7d' });
-          res.send(token);
-        })
+          return res.send({ token });
+        });
     })
     .catch((err) => {
       switch (err.constructor) {
@@ -147,5 +152,5 @@ module.exports = {
   getUserById,
   editUserInfo,
   editUserAvatar,
-  login
+  login,
 };
