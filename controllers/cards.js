@@ -1,7 +1,7 @@
 const { StatusCodes } = require('http-status-codes');
 
 const {
-  CREATED, BAD_REQUEST, INTERNAL_SERVER_ERROR, NOT_FOUND, OK, FORBIDDEN
+  CREATED, BAD_REQUEST, INTERNAL_SERVER_ERROR, NOT_FOUND, OK, FORBIDDEN,
 } = StatusCodes;
 const { default: mongoose } = require('mongoose');
 const Card = require('../models/card');
@@ -40,13 +40,13 @@ const removeCard = (req, res) => {
   Card.findById(cardId)
     .then((card) => {
       if (!card.owner.equals(req.user._id)) {
-        res.status(FORBIDDEN).send({message: 'Ошибка доступа'});
+        res.status(FORBIDDEN).send({ message: 'Ошибка доступа' });
         return;
       }
       Card.findByIdAndRemove(cardId)
-      .orFail()
-      .then((card) => res.status(OK).send(card))
-      .catch(() => res.status(INTERNAL_SERVER_ERROR).send(defaultServerError))
+        .orFail()
+        .then(() => res.status(OK).send({ message: 'Карточка успешно удалена' }))
+        .catch(() => res.status(INTERNAL_SERVER_ERROR).send(defaultServerError));
     })
     .catch((err) => {
       switch (err.constructor) {
