@@ -42,7 +42,19 @@ const removeCard = (req, res, next) => {
       Card.findByIdAndRemove(cardId)
         .orFail()
         .then(() => res.status(OK).send({ message: 'Карточка успешно удалена' }))
-        .catch(next);
+        .catch(err => {
+          switch (err.constructor) {
+            case mongoose.Error.CastError:
+              next(new BadRequestErr('Передан невалидный id карточки'));
+              break;
+            case mongoose.Error.DocumentNotFoundError:
+              next(new NotFoundErr('Карточка по указанному id не найдена'));
+              break;
+            default:
+              next(err);
+              break;
+          }
+        });
     })
     .catch((err) => {
       switch (err.constructor) {
