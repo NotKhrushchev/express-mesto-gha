@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const { StatusCodes } = require('http-status-codes');
 const { errors, celebrate, Joi } = require('celebrate');
 
-const { NOT_FOUND, INTERNAL_SERVER_ERROR } = StatusCodes;
+const { INTERNAL_SERVER_ERROR } = StatusCodes;
 
 const port = process.env.PORT || '3000';
 const DATABASE_URL = process.env.DATABASE_URL || 'mongodb://127.0.0.1:27017/mestodb';
@@ -46,7 +46,7 @@ app.use(auth);
 
 app.use('/users', routes.userRoute);
 app.use('/cards', routes.cardRoute);
-app.use('*', (req, res) => {
+app.use('*', () => {
   throw new NotFoundErr('Страница не найдена');
 });
 
