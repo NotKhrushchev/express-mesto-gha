@@ -85,7 +85,7 @@ const likeCard = (req, res, next) => {
     });
 };
 
-const dislikeCard = (req, res) => {
+const dislikeCard = (req, res, next) => {
   const { _id } = req.user;
   const { cardId } = req.params;
   Card.findByIdAndUpdate(
