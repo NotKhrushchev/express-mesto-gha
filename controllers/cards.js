@@ -72,11 +72,11 @@ const likeCard = (req, res, next) => {
     .then((likedCard) => res.status(OK).send(likedCard))
     .catch((err) => {
       switch (err.constructor) {
-        case mongoose.Error.CastError:
-          next(new BadRequestErr('Передан невалидный id карточки'));
-          break;
         case mongoose.Error.DocumentNotFoundError:
           next(new NotFoundErr('Карточка по указанному id не найдена'));
+          break;
+        case mongoose.Error.CastError:
+          next(new BadRequestErr('Передан невалидный id карточки'));
           break;
         default:
           next(err);
@@ -97,11 +97,11 @@ const dislikeCard = (req, res, next) => {
     .then((dislikedCard) => res.status(OK).send(dislikedCard))
     .catch((err) => {
       switch (err.constructor) {
-        case mongoose.Error.CastError:
-          next(new BadRequestErr('Передан невалидный id карточки'));
-          break;
         case mongoose.Error.DocumentNotFoundError:
           next(new NotFoundErr('Карточка по указанному id не найдена'));
+          break;
+        case mongoose.Error.CastError:
+          next(new BadRequestErr('Передан невалидный id карточки'));
           break;
         default:
           next(err);
