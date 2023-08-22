@@ -19,7 +19,11 @@ const createUser = (req, res, next) => {
     .then((hash) => User.create({
       email, password: hash, name, about, avatar,
     }))
-    .then((user) => res.status(CREATED).send(user))
+    .then((user) => {
+      const theUser = user;
+      theUser.password = undefined;
+      res.status(CREATED).send(theUser);
+    })
     .catch((err) => {
       if (err.code === 11000) {
         next(new DuplicateEmailErr());
