@@ -35,6 +35,7 @@ const removeCard = (req, res, next) => {
   const { cardId } = req.params;
   // Перед удалением проверяю на соответствие id пользователя и создателя карточки
   Card.findById(cardId)
+    .orFail()
     .then((card) => {
       if (!card.owner.equals(req.user._id)) {
         throw new AccessErr();
@@ -42,19 +43,7 @@ const removeCard = (req, res, next) => {
       Card.findByIdAndRemove(cardId)
         .orFail()
         .then(() => res.status(OK).send({ message: 'Карточка успешно удалена' }))
-        .catch((err) => {
-          switch (err.constructor) {
-            case mongoose.Error.CastError:
-              next(new BadRequestErr('Передан невалидный id карточки'));
-              break;
-            case mongoose.Error.DocumentNotFoundError:
-              next(new NotFoundErr('Карточка по указанному id не найдена'));
-              break;
-            default:
-              next(err);
-              break;
-          }
-        });
+        .catch(next);
     })
     .catch((err) => {
       switch (err.constructor) {
