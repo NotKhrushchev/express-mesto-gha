@@ -1,9 +1,8 @@
-const { StatusCodes } = require('http-status-codes');
+const { CREATED, OK } = require('http-status-codes').StatusCodes;
 const jwt = require('jsonwebtoken');
 
 const bcrypt = require('bcryptjs');
 
-const { CREATED, OK } = StatusCodes;
 const { default: mongoose } = require('mongoose');
 const User = require('../models/user');
 const {

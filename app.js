@@ -1,9 +1,8 @@
 const express = require('express');
 const mongoose = require('mongoose');
-const { StatusCodes } = require('http-status-codes');
-const { errors, celebrate, Joi } = require('celebrate');
-
-const { INTERNAL_SERVER_ERROR } = StatusCodes;
+const { errors } = require('celebrate');
+const helmet = require('helmet');
+const rateLimit = require('express-rate-limit');
 
 const port = process.env.PORT || '3000';
 const DATABASE_URL = process.env.DATABASE_URL || 'mongodb://127.0.0.1:27017/mestodb';
@@ -12,6 +11,8 @@ const routes = require('./routes/index');
 const { login, createUser } = require('./controllers/users');
 const { auth } = require('./middlewares/auth');
 const { NotFoundErr } = require('./errors');
+const { errorHandler } = require('./middlewares/errorHandler');
+const { signupCelebrate, signinCelebrate } = require('./middlewares/celebrateValidators');
 
 const app = express();
 
@@ -21,27 +22,22 @@ mongoose.connect(DATABASE_URL, {
   autoIndex: true,
 });
 
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 100,
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
 app.use(express.json());
+app.use(helmet());
+app.use(limiter);
 
 // Роут аутентификации
-app.post('/signin', celebrate({
-  body: Joi.object().keys({
-    email: Joi.string().required().email(),
-    password: Joi.string().required(),
-  }),
-}), login);
+app.post('/signin', signinCelebrate, login);
 
 // Роут регистрации
-app.post('/signup', celebrate({
-  body: Joi.object().keys({
-    email: Joi.string().required().email(),
-    password: Joi.string().required(),
-    name: Joi.string().min(2).max(30),
-    about: Joi.string().min(2).max(30),
-    /* eslint-disable no-useless-escape */
-    avatar: Joi.string().pattern(/(?:https?):\/\/(\w+:?\w*)?(\S+)(:\d+)?(\/|\/([\w#!:.?+=&%!\-\/]))?/),
-  }),
-}), createUser);
+app.post('/signup', signupCelebrate, createUser);
 
 app.use(auth);
 
@@ -52,13 +48,6 @@ app.use('*', () => {
 });
 
 app.use(errors());
-
-// Глобальный мидлвэр для обработки ошибок
-app.use((err, req, res, next) => {
-  const { statusCode = INTERNAL_SERVER_ERROR, message } = err;
-
-  res.status(statusCode).send({ message: statusCode === INTERNAL_SERVER_ERROR ? 'На сервере произошла ошибка' : message });
-  next();
-});
+app.use(errorHandler);
 
 app.listen(port);

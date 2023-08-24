@@ -1,6 +1,5 @@
-const { StatusCodes } = require('http-status-codes');
+const { CREATED, OK } = require('http-status-codes').StatusCodes;
 
-const { CREATED, OK } = StatusCodes;
 const { default: mongoose } = require('mongoose');
 const Card = require('../models/card');
 const { BadRequestErr, AccessErr, NotFoundErr } = require('../errors/index');
@@ -40,7 +39,7 @@ const removeCard = (req, res, next) => {
       if (!card.owner.equals(req.user._id)) {
         throw new AccessErr();
       }
-      Card.findByIdAndRemove(cardId)
+      Card.deleteOne(cardId)
         .orFail()
         .then(() => res.status(OK).send({ message: 'Карточка успешно удалена' }))
         .catch(next);

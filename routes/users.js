@@ -3,13 +3,14 @@ const { celebrate, Joi } = require('celebrate');
 const {
   getAllUsers, getUserById, editUserInfo, editUserAvatar, getMe,
 } = require('../controllers/users');
+const { URL_REGEX } = require('../utils/constants');
 
 router.get('/', getAllUsers);
 router.get('/me', getMe);
 
 router.get('/:userId', celebrate({
   params: Joi.object().keys({
-    userId: Joi.string().required().alphanum().length(24),
+    userId: Joi.string().required().hex().length(24),
   }),
 }), getUserById);
 
@@ -23,7 +24,7 @@ router.patch('/me', celebrate({
 router.patch('/me/avatar', celebrate({
   body: Joi.object().keys({
     /* eslint-disable no-useless-escape */
-    avatar: Joi.string().pattern(/(?:https?):\/\/(\w+:?\w*)?(\S+)(:\d+)?(\/|\/([\w#!:.?+=&%!\-\/]))?/),
+    avatar: Joi.string().pattern(URL_REGEX),
   }),
 }), editUserAvatar);
 
