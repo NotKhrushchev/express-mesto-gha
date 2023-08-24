@@ -39,7 +39,7 @@ app.post('/signin', signinCelebrate, login);
 // Роут регистрации
 app.post('/signup', signupCelebrate, createUser);
 
-// app.use(auth);
+app.use(auth);
 
 app.use('/users', routes.userRoute);
 app.use('/cards', routes.cardRoute);
