@@ -39,10 +39,10 @@ const removeCard = (req, res, next) => {
       if (!card.owner.equals(req.user._id)) {
         throw new AccessErr();
       }
-      Card.findByIdAndRemove(cardId)
+      Card.deleteOne({_id: cardId})
         .orFail()
         .then(() => res.status(OK).send({ message: 'Карточка успешно удалена' }))
-        .catch(next);
+        .catch(err => console.log(err));
     })
     .catch((err) => {
       switch (err.constructor) {
