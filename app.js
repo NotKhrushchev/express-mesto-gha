@@ -2,10 +2,11 @@ const express = require('express');
 const mongoose = require('mongoose');
 const { errors } = require('celebrate');
 const helmet = require('helmet');
+const cors = require('cors');
 const rateLimit = require('express-rate-limit');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
 
-const port = process.env.PORT || '3000';
+const port = process.env.PORT || '3001';
 const DATABASE_URL = process.env.DATABASE_URL || 'mongodb://127.0.0.1:27017/mestodb';
 
 const routes = require('./routes/index');
@@ -30,6 +31,8 @@ const limiter = rateLimit({
   legacyHeaders: false,
 });
 
+app.use(cors());
+
 app.use(express.json());
 app.use(helmet());
 app.use(limiter);
@@ -46,6 +49,7 @@ app.use(auth);
 
 app.use('/users', routes.userRoute);
 app.use('/cards', routes.cardRoute);
+
 app.use('*', () => {
   throw new NotFoundErr('Страница не найдена');
 });

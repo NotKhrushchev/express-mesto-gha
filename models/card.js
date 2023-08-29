@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const { URL_REGEX } = require('../utils/constants');
+const { IMG_REGEX } = require('../utils/constants');
 
 const cardSchema = new mongoose.Schema({
   name: {
@@ -13,7 +13,7 @@ const cardSchema = new mongoose.Schema({
     required: [true, 'Поле link обязательное'],
     validate: {
       /* eslint-disable no-useless-escape */
-      validator: (link) => URL_REGEX.test(link),
+      validator: (link) => IMG_REGEX.test(link),
       message: 'Введите корректную ссылку',
     },
   },

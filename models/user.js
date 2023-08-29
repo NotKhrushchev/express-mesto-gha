@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 const validator = require('validator');
-const { URL_REGEX } = require('../utils/constants');
+const { IMG_REGEX } = require('../utils/constants');
 
 const userSchema = new mongoose.Schema({
   email: {
@@ -34,7 +34,7 @@ const userSchema = new mongoose.Schema({
     default: 'https://pictures.s3.yandex.net/resources/jacques-cousteau_1604399756.png',
     validate: {
       /* eslint-disable no-useless-escape */
-      validator: (link) => URL_REGEX.test(link),
+      validator: (link) => IMG_REGEX.test(link),
       message: 'Введите корректную ссылку',
     },
   },

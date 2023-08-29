@@ -1,5 +1,5 @@
 const { celebrate, Joi } = require('celebrate');
-const { URL_REGEX } = require('../utils/constants');
+const { IMG_REGEX } = require('../utils/constants');
 
 const signupCelebrate = celebrate({
   body: Joi.object().keys({
@@ -8,7 +8,7 @@ const signupCelebrate = celebrate({
     name: Joi.string().min(2).max(30),
     about: Joi.string().min(2).max(30),
     /* eslint-disable no-useless-escape */
-    avatar: Joi.string().pattern(URL_REGEX),
+    avatar: Joi.string().pattern(IMG_REGEX),
   }),
 });
 

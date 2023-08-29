@@ -1,4 +1,4 @@
-const URL_REGEX = /^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})([/\w .-]*)*\/?$/;
+const IMG_REGEX = /(http(s?):)([/|.|\w|\s|-])*\.(?:jpg|gif|png)/;
 module.exports = {
-  URL_REGEX,
+  IMG_REGEX,
 };
